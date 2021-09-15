@@ -349,3 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /HiddenVilla_Server/appsettings.Development.json
+/HiddenVilla_Server/appsettings.json
+/DataAcesss/Migrations/ApplicationDbContextModelSnapshot.cs
