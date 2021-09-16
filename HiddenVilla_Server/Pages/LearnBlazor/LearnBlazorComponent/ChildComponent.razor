@@ -38,5 +38,10 @@
     public EventCallback<MouseEventArgs> OnClickBtnMethod { get; set; }
 
 
+    public async Task ShowToastrSuccess()
+    {
+        await JsRuntime.ToastrSuccess("Woohoo! Success is on its way!");
+    }
 
 }
+
