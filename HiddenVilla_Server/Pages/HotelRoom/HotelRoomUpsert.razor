@@ -52,7 +52,7 @@
                                             <span class="room-image-title">@serial</span>
                                         </div>
 
-                                        <button type="button" class="btn btn-outline-danger btn-block mt-4">
+                                        <button type="button" @onclick="()=>DeletePhoto(roomImage)" class="btn btn-outline-danger btn-block mt-4">
                                             Delete
                                         </button>
                                     </div>
@@ -73,8 +73,8 @@
 
 @code {
 
-        [Parameter]
-        public int? Id { get; set; }
+    [Parameter]
+    public int? Id { get; set; }
     private HotelRoomDTO HotelRoomModel { get; set; } = new HotelRoomDTO();
     private string Title { get; set; } = "Create";
     private HotelRoomImageDTO RoomImage { get; set; } = new HotelRoomImageDTO();
@@ -112,7 +112,7 @@
             {
                 //update
                 var updateRoomResult = await HotelRoomRepository.UpdateHotelRoom(HotelRoomModel.Id, HotelRoomModel);
-                if (HotelRoomModel.ImageUrls !=null && HotelRoomModel.ImageUrls.Any())
+                if (HotelRoomModel.ImageUrls != null && HotelRoomModel.ImageUrls.Any())
                 {
                     await AddHotelRoomImage(updateRoomResult);
                 }
@@ -191,18 +191,37 @@
 
     private async Task AddHotelRoomImage(HotelRoomDTO roomDetails)
     {
-
         foreach (var imageUrl in HotelRoomModel.ImageUrls)
-            if (HotelRoomModel.HotelRoomImages ==null ||  HotelRoomModel.HotelRoomImages.Where(x => x.RoomImageUrl == imageUrl).Count() == 0)
+        {
+            if (HotelRoomModel.HotelRoomImages.Where(x => x.RoomImageUrl == imageUrl).Count() == 0)
             {
+
+                RoomImage = new HotelRoomImageDTO()
                 {
-                    RoomImage = new HotelRoomImageDTO()
-                    {
-                        RoomId = roomDetails.Id,
-                        RoomImageUrl = imageUrl
-                    };
-                    await HotelImagesRepository.CreateHotelRoomImage(RoomImage);
-                }
+                    RoomId = roomDetails.Id,
+                    RoomImageUrl = imageUrl
+                };
+                await HotelImagesRepository.CreateHotelRoomImage(RoomImage);
             }
+        }
+    }
+
+    internal async Task DeletePhoto(string imageUrl)
+    {
+        try
+        {
+            var imageIndex = HotelRoomModel.ImageUrls.FindIndex(x => x == imageUrl);
+            var imageName = imageUrl.Replace($"RoomImages/", "");
+            if (HotelRoomModel.Id == 0 && Title == "Create")
+            {
+                var result = FileUpload.DeleteFile(imageName);
+            }
+            HotelRoomModel.ImageUrls.RemoveAt(imageIndex);
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.ToastrError(ex.Message);
+        }
+
     }
 }
