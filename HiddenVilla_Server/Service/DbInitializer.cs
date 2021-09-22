@@ -38,7 +38,7 @@ namespace HiddenVilla_Server.Service
             {
 
             }
-            /*** We already have Admin and Customer in our db from the mvc project
+            /*** We already have Admin and Customer in our db from the mvc project we only need to add an Employee role
 
             if (_db.Roles.Any(x => x.Name == SD.Role_Admin)) return;
 
