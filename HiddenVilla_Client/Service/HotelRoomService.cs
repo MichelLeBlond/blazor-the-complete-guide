@@ -23,7 +23,7 @@ namespace HiddenVilla_Client.Service
 
         public async Task<IEnumerable<HotelRoomDTO>> GetHotelRooms(string checkInDate, string checkOutDate)
         {
-            var response = await _client.GetAsync($"api/hotelroom?checkInDate={checkInDate}&checkOutDate={checkOutDate}/");
+            var response = await _client.GetAsync($"api/hotelroom?checkInDate={checkInDate}&checkOutDate={checkOutDate}");
             var content = await response.Content.ReadAsStringAsync();
             var rooms = JsonConvert.DeserializeObject<IEnumerable<HotelRoomDTO>>(content);
             return rooms;
