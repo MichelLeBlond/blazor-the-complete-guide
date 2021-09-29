@@ -54,7 +54,7 @@ namespace HiddenVilla_Api.Controllers
             var allRooms = await _hotelRoomRepository.GetAllHotelRooms(checkInDate,checkOutDate);
             return Ok(allRooms);
         }
-        [Authorize(Roles = SD.Role_Admin)]
+       // [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetHotelRoom(int? roomId, string checkInDate = null, string checkOutDate = null)
         {
