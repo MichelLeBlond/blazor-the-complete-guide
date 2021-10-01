@@ -111,7 +111,14 @@ else
                         </select>
                     </div>
                     <div class="form-group">
+                        @if (HotelBooking.OrderDetails.HotelRoomDTO.IsBooked)
+                        {
+                        <button type="submit" class="btn btn-secondary form-control">Sold Out</button>
+                        }
+                        else
+                        {
                         <button type="submit" class="btn btn-success form-control">Checkout Now</button>
+                        }
                     </div>
                 </EditForm>
             </div>

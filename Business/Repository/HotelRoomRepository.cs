@@ -54,6 +54,13 @@ namespace Business.Repository
                 IEnumerable<HotelRoomDTO> hotelRoomDTOs =
                             _mapper.Map<IEnumerable<HotelRoom>, IEnumerable<HotelRoomDTO>>
                             (_db.HotelRooms.Include(x => x.HotelRoomImages));
+                if (!string.IsNullOrEmpty(chekOutDateStr) && !string.IsNullOrEmpty(checkInDateStr))
+                {
+                    foreach (HotelRoomDTO hotelRoom in hotelRoomDTOs)
+                    {
+                        hotelRoom.IsBooked = await IsRoomBooked(hotelRoom.Id, checkInDateStr, chekOutDateStr);
+                    }
+                }
 
                 return hotelRoomDTOs;
             }
@@ -69,6 +76,10 @@ namespace Business.Repository
             {
                 HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom, HotelRoomDTO>(
                     await _db.HotelRooms.Include(x => x.HotelRoomImages).FirstOrDefaultAsync(x => x.Id == roomId));
+                if(!string.IsNullOrEmpty(chekOutDateStr)&& !string.IsNullOrEmpty(checkInDateStr))
+                {
+                    hotelRoom.IsBooked = await IsRoomBooked(roomId, checkInDateStr, chekOutDateStr);
+                }
 
                 return hotelRoom;
             }
@@ -76,6 +87,37 @@ namespace Business.Repository
             {
                 return null;
             }
+        }
+
+
+        public async Task<bool> IsRoomBooked(int RoomId, string checkInDatestr, string checkOutDatestr)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(checkInDatestr)&& !string.IsNullOrEmpty(checkOutDatestr))
+                {
+                        DateTime checkInDate = DateTime.ParseExact(checkInDatestr, "MM/dd/yyyy", null);
+                        DateTime checkOutDate = DateTime.ParseExact(checkOutDatestr, "MM/dd/yyyy", null);
+
+                        var existingBooking = await _db.RoomOrderDetails.Where(x => x.RoomId == RoomId && x.IsPaymentSuccessful &&
+                      //verify checkin date is not already taken
+                      ((checkInDate < x.CheckOutDate && checkInDate.Date > x.CheckInDate)
+                      //verify checkout date is not already taken
+                      || (checkOutDate.Date > x.CheckInDate.Date && checkInDate.Date <= x.CheckInDate.Date)
+                      )).FirstOrDefaultAsync();
+                    if(existingBooking != null)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                return true;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+          
         }
 
         //if unique returns null else returns the room obj
