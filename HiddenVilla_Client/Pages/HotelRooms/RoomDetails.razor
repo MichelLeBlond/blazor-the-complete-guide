@@ -4,7 +4,8 @@
 @inject IHotelRoomService hotelRoomService
 @inject IStripePaymentService stripePaymentService
 @inject IRoomOrderDetailsService roomOrderDetailsService
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = SD.Role_Customer)]
 @if (HotelBooking?.OrderDetails?.HotelRoomDTO?.HotelRoomImages == null)
 {
     <div class="spinner"></div>
@@ -111,13 +112,14 @@ else
                         </select>
                     </div>
                     <div class="form-group">
+
                         @if (HotelBooking.OrderDetails.HotelRoomDTO.IsBooked)
                         {
-                        <button type="submit" class="btn btn-secondary form-control">Sold Out</button>
+                            <input class="btn btn-secondary form-control" value="Sold Out" />
                         }
                         else
                         {
-                        <button type="submit" class="btn btn-success form-control">Checkout Now</button>
+                            <button type="submit" class="btn btn-success form-control">Checkout Now</button>
                         }
                     </div>
                 </EditForm>
@@ -166,6 +168,15 @@ else
                          HotelBooking.OrderDetails.HotelRoomDTO.RegularRate;
                 }
             }
+
+            if (await localStorage.GetItemAsync<UserDTO>(SD.Local_UserDetails) != null)
+            {
+                var userInfo = await localStorage.GetItemAsync<UserDTO>(SD.Local_UserDetails);
+                HotelBooking.OrderDetails.UserId = userInfo.Id;
+                HotelBooking.OrderDetails.Name = userInfo.Name;
+                HotelBooking.OrderDetails.Email = userInfo.Email;
+                HotelBooking.OrderDetails.Phone = userInfo.PhoneNo;
+            }
         }
         catch (Exception e)
         {
@@ -185,7 +196,6 @@ else
         HotelBooking.OrderDetails.HotelRoomDTO.TotalDays = NoOfNights;
         HotelBooking.OrderDetails.HotelRoomDTO.TotalAmount = NoOfNights * HotelBooking.OrderDetails.HotelRoomDTO.RegularRate;
     }
-
 
     private async Task HandleCheckout()
     {
@@ -212,11 +222,12 @@ else
             var roomOrderDetailsSaved = await roomOrderDetailsService.SaveRoomOrderDetails(HotelBooking.OrderDetails);
 
             await localStorage.SetItemAsync(SD.Local_RoomOrderDetails, roomOrderDetailsSaved);
+
             await jsRuntime.InvokeVoidAsync("redirectToCheckout", result.Data.ToString());
         }
         catch (Exception e)
         {
-           await jsRuntime.ToastrError(e.Message);
+            await jsRuntime.ToastrError(e.Message);
         }
 
     }
