@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +42,7 @@ namespace HiddenVilla_Api
             object p = services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             var appSettingsSection = Configuration.GetSection("APISettings");
+            services.Configure<MailJetSettings>(Configuration.GetSection("MailJetSettings"));
             services.Configure<APISettings>(appSettingsSection);
             var apiSettings = appSettingsSection.Get<APISettings>();
             var key = Encoding.ASCII.GetBytes(apiSettings.SecretKey);
@@ -72,6 +74,7 @@ namespace HiddenVilla_Api
             services.AddScoped<IAmenityRepository, AmenityRepository>();
             services.AddScoped<IRoomOrderDetailsRepository, RoomOrderDetailsRepository>();
             services.AddScoped<IHotelImagesRepository, HotelImagesRepository>();
+            services.AddScoped<IEmailSender, EmailSender>();
             services.AddCors(o => o.AddPolicy("HiddenVilla",builder=> { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }));
             services.AddRouting(option => option.LowercaseUrls = true);
             services.AddControllers().AddJsonOptions(opt=>opt.JsonSerializerOptions.PropertyNamingPolicy=null).AddNewtonsoftJson(opt=> { opt.SerializerSettings.ContractResolver = new DefaultContractResolver();

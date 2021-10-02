@@ -5,7 +5,8 @@
 @inject IStripePaymentService stripePaymentService
 @inject IRoomOrderDetailsService roomOrderDetailsService
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Roles = SD.Role_Customer)]
+@attribute [Authorize(Roles = SD.Role_Customer + "," + SD.Role_Admin)]
+
 @if (HotelBooking?.OrderDetails?.HotelRoomDTO?.HotelRoomImages == null)
 {
     <div class="spinner"></div>
