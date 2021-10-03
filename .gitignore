@@ -351,3 +351,4 @@ MigrationBackup/
 /HiddenVilla_Server/appsettings.Development.json
 /HiddenVilla_Server/appsettings.json
 /DataAcesss/Migrations/ApplicationDbContextModelSnapshot.cs
+/HiddenVilla_Api/appsettings.json
